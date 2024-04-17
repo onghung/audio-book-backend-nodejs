@@ -4,6 +4,8 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const config = require('./config')
 const bookRouter = require('./routes/book-routes')
+const authRouter = require('./routes/auth-routers')
+
 
 
 const app = express();
@@ -13,5 +15,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api', bookRouter.routes)
+app.use('/api/auth', authRouter.routes)
+
 
 app.listen(config.port, () => console.log('listening on port ' + config.port))
