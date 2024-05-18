@@ -34,6 +34,7 @@ const getAllBooks = async (req, res, next) => {
                     doc.data().view,
                     doc.data().content, 
                     doc.data().url,
+                    doc.data().sound,
                 );
                 booksArray.push(book); // Thêm sách vào mảng
             });
@@ -90,4 +91,3 @@ module.exports = {
     updateBook,
     deleteBook
 }
-
