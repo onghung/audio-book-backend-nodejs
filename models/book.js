@@ -1,6 +1,6 @@
 class Book{
     constructor(id, name, description, start, 
-        price, view, content, url){
+        price, view, content, url, sound){
         this.id = id;
         this.name = name;
         this.description = description;
@@ -9,6 +9,7 @@ class Book{
         this.view = view;
         this.content = content;
         this.url = url;
+        this.sound = sound;
     }
 }
 
