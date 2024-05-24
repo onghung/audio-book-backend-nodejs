@@ -4,15 +4,16 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const config = require('./config')
 const bookRouter = require('./routes/book-routes')
-<<<<<<< Updated upstream
-=======
-const authRouter = require('./routes/auth-routers')
-const ttsRoutes = require('./routes/tts-routers');
 const paypal = require('./services/paypal');
 const firebase = require('./db')
 const firestore = firebase.firestore();
+const admin = require('firebase-admin')
+const credentials = require('./serviceAcountKey.json')
 
->>>>>>> Stashed changes
+admin.initializeApp({
+    credential: admin.credential.cert(credentials)
+  });
+
 
 
 const app = express();
@@ -20,12 +21,43 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.post('/api/signup', async (req, res) => {
+    console.log(req.body);
+    const user = {
+      email: req.body.email,
+      password: req.body.password
+    };
+    try {
+      const userResponse = await admin.auth().createUser({
+        email: user.email,
+        password: user.password,
+        emailVerified: false,
+        disabled: false
+      });
+      res.json(userResponse);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.post('/api/signin', async (req, res) => {
+    console.log(req.body);
+    const user = {
+      email: req.body.email,
+      password: req.body.password
+    };
+    try {
+      const userCredential = await firebase.auth().signInWithEmailAndPassword(user.email, user.password);
+      const idToken = await userCredential.user.getIdToken();
+      res.json({ idToken });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  });
 
 app.use('/api', bookRouter.routes)
-<<<<<<< Updated upstream
-=======
-app.use('/api/auth', authRouter.routes)
-app.use('/api/openai', ttsRoutes.routes)
 app.get('/pay', async(req, res) => {
     try{
         const url = await paypal.createOrder();
@@ -41,7 +73,7 @@ app.get('/complete-order', async (req, res) => {
 
         const data = {
             active: true,
-            account: 'test@gmail.com'
+            account: 'hung@gmail.com'
         };
         const docRef = await firestore.collection('active').add(data);
 
@@ -54,6 +86,5 @@ app.get('/complete-order', async (req, res) => {
 app.get('/cancel-order', (req, res) => {
     res.send("Cancel Order")
 })
->>>>>>> Stashed changes
 
 app.listen(config.port, () => console.log('listening on port ' + config.port))
